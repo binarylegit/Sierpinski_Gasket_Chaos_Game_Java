@@ -1,3 +1,35 @@
-A java simulation of the chaos game to create a sierpinski gasket.  The Chaos Game follows the rules and outline provided by Ian Stewart in "The Magical Maze".
+ChaosGame.java is a simulation of a particular chaos game that results in 
+an approximation of a sierpinski gasket
+(http://en.wikipedia.org/wiki/Sierpinski_triangle).  A Sierpinski Gasket is
+a fractal that is infinitely self-similar.  
 
-This demonstrates how a seemingly random event can create something with defined meaning/structure.
+I was aqquanted with the gasket in Ian Stewarts book "The Magical Maze"
+in which he describes chaos theory very briefly and uses this Chaos Game
+as a means to show how chaos or random actions can result in suprisingly
+meaningful and predictable results.
+
+The following are the rules by which the game is set up and played:
+
+1. Draw an equilateral triangle
+2. Assign each vertex of the triangle a value (e.g. 1,2,3 or a,b,c)
+3. Choose and mark a randomly selected point within the triangle as a 
+	start position.
+4. using a three sided die (or something that has equal probablity of
+	landing on one of three sides) assign each "side" to one vertex
+	of the triangle.
+5. roll the die, from the previously drawn point draw a new point half way
+	between the point and the vertex that the die indicates.
+6. repeat step 5 ad infinitum or until you feel like stopping.
+7. note the "ordered" structure of the points that resulted.
+
+Naturally it would take a significant amount of time to perform this game by 
+hand and thus I wrote this program to simulate it.  With this program
+you can either choose to watch each turn played out or simply see the end result.
+
+For a sample you can look at ChaosGame_sample_output.png in this repository,
+although I would suggest running the program for a more eye opening experience!
+
+Enjoy!
+
+and if you have any questions, comments, or bugs to report feel free to e-mail me at:
+legit [at] alephcipher [dot] com
