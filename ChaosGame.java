@@ -27,7 +27,13 @@ public class ChaosGame extends JComponent implements Runnable
 		// get the number of turns from the user
 		// TODO: catch the exception of a non-integer value here
 		Integer turns = new Integer(JOptionPane.showInputDialog("How many turns should be played (integer)"));
-		JOptionPane.showMessageDialog(null, turns + " turns will be played");
+
+		boolean setShowTurns = false;
+
+		if(JOptionPane.showConfirmDialog(null, turns + " turns will be played.\n\n Shall I show each turn as it is played?", "Chaos Game", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+		{
+			setShowTurns = true;
+		}
 
 		// create the game interface
 		JFrame frame = new JFrame();
@@ -40,7 +46,7 @@ public class ChaosGame extends JComponent implements Runnable
 			}
 		});
 
-		ChaosGame game = new ChaosGame(turns);
+		ChaosGame game = new ChaosGame(turns, setShowTurns);
 		
 		// add the game drawing component
 		frame.getContentPane().add(game);
@@ -69,17 +75,22 @@ public class ChaosGame extends JComponent implements Runnable
 	// global object variables
 	private Integer totalTurns;
 	private Integer currentTurn = 0;
-	ArrayList<Point> points = new ArrayList();
+	private ArrayList<Point> points = new ArrayList();
 	// TODO: remove magic numbers
-	Point aVertex = new Point((250 + triXOffset), (67 + triYOffset));
-	Point bVertex = new Point((0 + triXOffset), (500 + triYOffset));
-	Point cVertex = new Point((500 + triXOffset), (500 + triYOffset));
+	private Point aVertex = new Point((250 + triXOffset), (67 + triYOffset));
+	private Point bVertex = new Point((0 + triXOffset), (500 + triYOffset));
+	private Point cVertex = new Point((500 + triXOffset), (500 + triYOffset));
 	private Random rand = new Random();
+	private boolean showTurns = true;
 
 
-	public ChaosGame(int turns)
+	public ChaosGame(int turns, boolean setShowTurns)
 	{ 
+		// Get an initial point from which to start the game
 		points.add(getRandomPoint(triWidth, triHeight));
+
+		showTurns = setShowTurns;
+
 		totalTurns = turns;	
 	}
 
@@ -121,30 +132,40 @@ public class ChaosGame extends JComponent implements Runnable
 	}
 
 
+	/**
+	 * This runs a thread to generate points for the Chaos Game according 
+	 * to it's rules.
+	 */
 	public void run()
 	{
 		try{
-		while(currentTurn <= totalTurns )
-		{
 
-			//TODO: this can be simplified/optimized
 			// get the last point
 			Point last = points.get( points.size() - 1 );
+			while(currentTurn < totalTurns )
+			{
 
-			// Take a turn (draw a random corner, get the associated point)
-			points.add(this.takeTurn(last));
+				// Take a turn (draw a random corner, get the associated point)
+				Point newPoint = this.takeTurn(last);
+				points.add(newPoint);
+				
+				last = newPoint;
 
-			// repaint
-			repaint();
+				if(showTurns)
+				{
+					// repaint
+					repaint();
 
-			// wait
-			Thread.sleep(500);
-		}
+					// wait
+					Thread.sleep(500);
+				}
+			}
 		
 		} catch(InterruptedException iexc)
 		{
 			System.out.println("thread Interrupted code: 137");
 		}
+		repaint();
 		return;
 	}
 
@@ -154,7 +175,7 @@ public class ChaosGame extends JComponent implements Runnable
 
 		// get random int of 1,2,3
 		int roll = rand.nextInt(3) + 1;
-		System.out.println("roll: " + roll);
+		//System.out.println("roll: " + roll); // DEBUG
 		Point vertex = this.getPoint(roll);
 
 		// get point between prevPoint and vertex
