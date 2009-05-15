@@ -1,6 +1,7 @@
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.lang.*;
 import java.util.*;
 
 /**
@@ -66,7 +67,7 @@ public class ChaosGame extends JComponent implements Runnable
 	private static int frameWidth = 560;
 	private static int frameHeight = 560;
 	private static int triXOffset = 20; // amount to add to x
-	private static int triYOffset = 10; // amount to add to y
+	private static int triYOffset = 77; // amount to add to y
 	private static int triWidth = 500;
 	private static int triHeight = 433;
 	
@@ -77,9 +78,11 @@ public class ChaosGame extends JComponent implements Runnable
 	private Integer currentTurn = 0;
 	private ArrayList<Point> points = new ArrayList();
 	// TODO: remove magic numbers
-	private Point aVertex = new Point((250 + triXOffset), (67 + triYOffset));
-	private Point bVertex = new Point((0 + triXOffset), (500 + triYOffset));
-	private Point cVertex = new Point((500 + triXOffset), (500 + triYOffset));
+	// The Triangle is an equilateral triangle with sides of 500px
+	// doing the math we get a height of ~433 px 
+	private Point aVertex = new Point(((triWidth / 2) + triXOffset), (triYOffset));
+	private Point bVertex = new Point(triXOffset, (triHeight + triYOffset));
+	private Point cVertex = new Point((triWidth + triXOffset), (triHeight + triYOffset));
 	private Random rand = new Random();
 	private boolean showTurns = true;
 
@@ -99,7 +102,27 @@ public class ChaosGame extends JComponent implements Runnable
 	{
 		// get a random point within the triangle
 		// TODO: make this method actually do something
-		return new Point(250,250);
+
+		// get a random Y value ( - 2 makes sure it is within the triangle)
+		Integer yVal = new Integer(rand.nextInt(triHeight - 2) + 1);
+		System.out.println("yVal: " + yVal);
+
+		// figure out what range of X-values are legal for yVal
+		// tangent(30) = .5773502692
+		Double xRange = ( .5773502692 * yVal) - 1;
+
+		Integer relXOffset = 250 - xRange.intValue();
+
+		xRange *= 2;
+
+		System.out.println("xRange: " + xRange);
+
+		Integer xVal = new Integer( rand.nextInt(xRange.intValue()) + 1);
+		System.out.println("xVal: " + xVal);
+
+
+
+		return new Point((triXOffset + relXOffset + xVal), (triYOffset + yVal));
 	}
 
 	public void paint(Graphics g)
@@ -117,9 +140,11 @@ public class ChaosGame extends JComponent implements Runnable
 		g.fillOval(cVertex.getX(), cVertex.getY(), 5, 5); // point c = 3
 
 		// label the points of the triangle
-		g.drawString("a", 250 + triXOffset, 63 +triYOffset);
-		g.drawString("b", -9 + triXOffset, 506 +triYOffset);
-		g.drawString("c", 509 + triXOffset, 506 +triYOffset);
+		// extra "magic" numbers are slight offsets so that the 
+		// vertex labels aren't overlapping the points they label
+		g.drawString("a", aVertex.getX(), (aVertex.getY() - 4));
+		g.drawString("b", (bVertex.getX() - 9), (bVertex.getY() + 9));
+		g.drawString("c", (cVertex.getX() + 9), (cVertex.getY() + 6));
 
 
 		// draw the points
