@@ -25,6 +25,7 @@ public class ChaosGame extends JComponent implements Runnable
 	{
 
 		// get the number of turns from the user
+		// TODO: catch the exception of a non-integer value here
 		Integer turns = new Integer(JOptionPane.showInputDialog("How many turns should be played (integer)"));
 		JOptionPane.showMessageDialog(null, turns + " turns will be played");
 
@@ -39,44 +40,56 @@ public class ChaosGame extends JComponent implements Runnable
 			}
 		});
 
+		ChaosGame game = new ChaosGame(turns);
+		
 		// add the game drawing component
-		frame.getContentPane().add(new ChaosGame(turns));
+		frame.getContentPane().add(game);
 
 		// set size and visibility of frame
 		frame.setSize(frameWidth, frameHeight);
 		frame.setVisible(true);
 
 		
+		(new Thread(game)).start();
+		
 		
 	}
+
 
 	// global class variables
 	private static int frameWidth = 560;
 	private static int frameHeight = 560;
+	private static int triXOffset = 20; // amount to add to x
+	private static int triYOffset = 10; // amount to add to y
+	private static int triWidth = 500;
+	private static int triHeight = 433;
 	
 
 
 	// global object variables
 	private Integer totalTurns;
-	private Integer currentTurn;
+	private Integer currentTurn = 0;
 	ArrayList<Point> points = new ArrayList();
-
-
+	// TODO: remove magic numbers
+	Point aVertex = new Point((250 + triXOffset), (67 + triYOffset));
+	Point bVertex = new Point((0 + triXOffset), (500 + triYOffset));
+	Point cVertex = new Point((500 + triXOffset), (500 + triYOffset));
+	private Random rand = new Random();
 
 
 	public ChaosGame(int turns)
 	{ 
+		points.add(getRandomPoint(triWidth, triHeight));
 		totalTurns = turns;	
 	}
 
-	public void run()
+
+	public Point getRandomPoint(int triWidth, int triHeight)
 	{
-
-		// get random start point
-		
-
+		// get a random point within the triangle
+		// TODO: make this method actually do something
+		return new Point(250,250);
 	}
-
 
 	public void paint(Graphics g)
 	{
@@ -85,15 +98,92 @@ public class ChaosGame extends JComponent implements Runnable
 		
 		// draw some strings
 		g.drawString("Playing the Chaos Game to Create a Sierpinski Gasket", 0, 10);
+		g.drawString("Current Turn: " + currentTurn, 0, 20);
 		
 		// draw the points of the triangle
-		g.fillOval(20, 510, 5, 5);
-		g.fillOval(520, 510, 5, 5);
-		g.fillOval(270, 77, 5, 5);
+		g.fillOval(aVertex.getX(), aVertex.getY(), 5, 5); // point a = 1
+		g.fillOval(bVertex.getX(), bVertex.getY(),  5, 5); // point b = 2
+		g.fillOval(cVertex.getX(), cVertex.getY(), 5, 5); // point c = 3
+
+		// label the points of the triangle
+		g.drawString("a", 250 + triXOffset, 63 +triYOffset);
+		g.drawString("b", -9 + triXOffset, 506 +triYOffset);
+		g.drawString("c", 509 + triXOffset, 506 +triYOffset);
+
+
+		// draw the points
+		for( Point currPoint : points )
+		{
+			g.fillOval(currPoint.getX(), currPoint.getY(), 2, 2);
+		}
 
 
 	}
 
+
+	public void run()
+	{
+		try{
+		while(currentTurn <= totalTurns )
+		{
+
+			//TODO: this can be simplified/optimized
+			// get the last point
+			Point last = points.get( points.size() - 1 );
+
+			// Take a turn (draw a random corner, get the associated point)
+			points.add(this.takeTurn(last));
+
+			// repaint
+			repaint();
+
+			// wait
+			Thread.sleep(500);
+		}
+		
+		} catch(InterruptedException iexc)
+		{
+			System.out.println("thread Interrupted code: 137");
+		}
+		return;
+	}
+
+
+	private Point takeTurn(Point prevPoint)
+	{
+
+		// get random int of 1,2,3
+		int roll = rand.nextInt(3) + 1;
+		System.out.println("roll: " + roll);
+		Point vertex = this.getPoint(roll);
+
+		// get point between prevPoint and vertex
+		Point nextPoint = new Point(((vertex.getX() + prevPoint.getX())/2), 
+					((vertex.getY() + prevPoint.getY())/2));
+
+		currentTurn++;
+
+		return nextPoint;
+	}
+
+
+	// val is an int between 1 and 3
+	private Point getPoint(int val)
+	{
+		if(val == 1)
+		{
+			return aVertex;
+		} else if (val == 2)
+		{
+			return bVertex;
+		} else if (val == 3)
+		{
+			return cVertex;
+		} else {
+			return null;
+		}
+	}
+	
 
 
 	class Point{
