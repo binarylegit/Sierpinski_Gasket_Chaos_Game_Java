@@ -5,7 +5,7 @@ import java.lang.*;
 import java.util.*;
 
 /**
- * the rules of the game are as such:
+ * The rules of the game are as such:
  * 	1 - draw an equilateral triangle
  * 	2 - assign each vertice of the triangle a value (e.g. 1,2,3)
  * 	3 - mark a random point in the triangle for a start point
@@ -17,8 +17,8 @@ import java.util.*;
  * 	6 - repeat step 5 ad infinitum or up to some defined number of iterations.
  * 	7 - note the "order" of the resulting points within the triangle.
  *
+ *  TODO: add fuller documentation
  */ 
-// TODO: get rid of all the magic numbers
 public class ChaosGame extends JComponent implements Runnable
 {
 
@@ -74,20 +74,29 @@ public class ChaosGame extends JComponent implements Runnable
 
 
 	// global object variables
-	private Integer totalTurns;
-	private Integer currentTurn = 0;
-	private ArrayList<Point> points = new ArrayList();
-	// TODO: remove magic numbers
+	private Integer totalTurns; // total turns to take (set by user)
+	private Integer currentTurn = 0; // the current turn we are on
+	private ArrayList<Point> points = new ArrayList<Point>(); // container 
+		// for all of the points to be drawn
+
 	// The Triangle is an equilateral triangle with sides of 500px
-	// doing the math we get a height of ~433 px 
-	private Point aVertex = new Point(((triWidth / 2) + triXOffset), (triYOffset));
-	private Point bVertex = new Point(triXOffset, (triHeight + triYOffset));
-	private Point cVertex = new Point((triWidth + triXOffset), (triHeight + triYOffset));
-	private Random rand = new Random();
-	private boolean showTurns = true;
+	// Doing the math ( 433 = sqrt( 500^2 - 250^2 ) ) we get a height of ~433 px 
+	private Point aVertex = new Point(((triWidth / 2) + triXOffset), (triYOffset)); // location of the vertex a
+	private Point bVertex = new Point(triXOffset, (triHeight + triYOffset)); // location of the vertex b
+	private Point cVertex = new Point((triWidth + triXOffset), (triHeight + triYOffset)); // location of the vertex c
+	private Random rand = new Random(); // global random object for generating random numbers
+	private boolean showTurns = true; // shall each turn be shown to the user (set by the user)
 
 
-	public ChaosGame(int turns, boolean setShowTurns)
+	/**
+	 * Constructor for the ChaosGame, constructor sets various global object variables.
+	 *
+	 * @param turns sets the number of turns to be played in the game
+	 * @param setShowTurns if true a turn will be played and drawn every 500 milliseconds
+	 * 			, if false all turns will be played but not displayed to the
+	 * 			user untill all turns have been played.
+	 */
+	private ChaosGame(int turns, boolean setShowTurns)
 	{ 
 		// Get an initial point from which to start the game
 		points.add(getRandomPoint(triWidth, triHeight));
@@ -98,14 +107,20 @@ public class ChaosGame extends JComponent implements Runnable
 	}
 
 
-	public Point getRandomPoint(int triWidth, int triHeight)
+	/**
+	 * getRandomPoint generates a random point within the triangle
+	 * that is specified by the Height and Width
+	 */
+	// TODO: this method uses both global object variables and input
+	// parameters to determine the random point this is an
+	// inconsistent use of data sources -- pick one(global or passed in)
+	private Point getRandomPoint(int triWidth, int triHeight)
 	{
 		// get a random point within the triangle
-		// TODO: make this method actually do something
 
 		// get a random Y value ( - 2 makes sure it is within the triangle)
 		Integer yVal = new Integer(rand.nextInt(triHeight - 2) + 1);
-		System.out.println("yVal: " + yVal);
+		//System.out.println("yVal: " + yVal); //DEBUG
 
 		// figure out what range of X-values are legal for yVal
 		// tangent(30) = .5773502692
@@ -115,16 +130,15 @@ public class ChaosGame extends JComponent implements Runnable
 
 		xRange *= 2;
 
-		System.out.println("xRange: " + xRange);
+		//System.out.println("xRange: " + xRange); // DEBUG
 
 		Integer xVal = new Integer( rand.nextInt(xRange.intValue()) + 1);
-		System.out.println("xVal: " + xVal);
-
-
+		//System.out.println("xVal: " + xVal); // DEBUG
 
 		return new Point((triXOffset + relXOffset + xVal), (triYOffset + yVal));
 	}
 
+	
 	public void paint(Graphics g)
 	{
 		// get the graphics component
