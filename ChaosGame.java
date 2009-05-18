@@ -30,11 +30,19 @@ public class ChaosGame extends JComponent implements Runnable
 		Integer turns = new Integer(JOptionPane.showInputDialog("How many turns should be played (integer)"));
 
 		boolean setShowTurns = false;
+		boolean setShowLines = false;
 
-		if(JOptionPane.showConfirmDialog(null, turns + " turns will be played.\n\n Shall I show each turn as it is played?", "Chaos Game", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+		if(JOptionPane.showConfirmDialog(null, turns + " turns will be played.\n\n Shall I show each turn as it is played? (.5 seconds per turn)", "Chaos Game", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 		{
 			setShowTurns = true;
+
+			if(JOptionPane.showConfirmDialog(null, "Each turn will be shown.\n\nShall I draw a line illustrating each turn? ", "Chaos Game", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+			{
+				setShowLines = true;
+			}
 		}
+
+
 
 		// create the game interface
 		JFrame frame = new JFrame();
@@ -47,7 +55,7 @@ public class ChaosGame extends JComponent implements Runnable
 			}
 		});
 
-		ChaosGame game = new ChaosGame(turns, setShowTurns);
+		ChaosGame game = new ChaosGame(turns, setShowTurns, setShowLines);
 		
 		// add the game drawing component
 		frame.getContentPane().add(game);
@@ -86,6 +94,7 @@ public class ChaosGame extends JComponent implements Runnable
 	private Point cVertex = new Point((triWidth + triXOffset), (triHeight + triYOffset)); // location of the vertex c
 	private Random rand = new Random(); // global random object for generating random numbers
 	private boolean showTurns = true; // shall each turn be shown to the user (set by the user)
+	private boolean showLines = true; // shall a line be temporarily drawn illustrating each turn (set by the user)
 
 
 	/**
@@ -96,12 +105,13 @@ public class ChaosGame extends JComponent implements Runnable
 	 * 			, if false all turns will be played but not displayed to the
 	 * 			user untill all turns have been played.
 	 */
-	private ChaosGame(int turns, boolean setShowTurns)
+	private ChaosGame(int turns, boolean setShowTurns, boolean setShowLines)
 	{ 
 		// Get an initial point from which to start the game
 		points.add(getRandomPoint(triWidth, triHeight));
 
 		showTurns = setShowTurns;
+		showLines = setShowLines;
 
 		totalTurns = turns;	
 	}
@@ -165,6 +175,13 @@ public class ChaosGame extends JComponent implements Runnable
 		for( Point currPoint : points )
 		{
 			g.fillOval(currPoint.getX(), currPoint.getY(), 2, 2);
+		}
+
+		if(showLines && (currentTurn != totalTurns))
+		{
+			Point point1 = points.get( points.size() - 1 );
+			Point point2 = points.get( points.size() - 2 );
+			g.drawLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
 		}
 
 
