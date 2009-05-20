@@ -5,6 +5,11 @@ import java.lang.*;
 import java.util.*;
 
 /**
+ * This Java class is a self-contained java program for running a "ChaosGame"
+ * that creates a Sierpinski Gasket.  The program follows the rules of the 
+ * game (below) to play and create the gasket.  The game was designed from
+ * the rules described in Ian Stewarts book "The Magical Maze".
+ *
  * The rules of the game are as such:
  * 	1 - draw an equilateral triangle
  * 	2 - assign each vertice of the triangle a value (e.g. 1,2,3)
@@ -15,13 +20,19 @@ import java.util.*;
  * 		the previous point and the vertice that has the value of the 
  * 		random value.
  * 	6 - repeat step 5 ad infinitum or up to some defined number of iterations.
- * 	7 - note the "order" of the resulting points within the triangle.
+ * 	7 - note the geometry of the resulting points within the triangle.
  *
  *  TODO: add fuller documentation
  */ 
 public class ChaosGame extends JComponent implements Runnable
 {
 
+	/**
+	 * This is the main method that must be invocated to play the full game
+	 * within the class.  
+	 *
+	 * @param args any command line arguments, all are ignored.
+	 */
 	public static void main(String[] args)
 	{
 
@@ -64,7 +75,7 @@ public class ChaosGame extends JComponent implements Runnable
 		frame.setSize(frameWidth, frameHeight);
 		frame.setVisible(true);
 
-		
+		// start the thread that plays the game
 		(new Thread(game)).start();
 		
 		
@@ -72,12 +83,12 @@ public class ChaosGame extends JComponent implements Runnable
 
 
 	// global class variables
-	private static int frameWidth = 560;
-	private static int frameHeight = 560;
-	private static int triXOffset = 20; // amount to add to x
-	private static int triYOffset = 77; // amount to add to y
-	private static int triWidth = 500;
-	private static int triHeight = 433;
+	private static int frameWidth = 560; // Width of the game window
+	private static int frameHeight = 560; // Height of the game window
+	private static int triXOffset = 20; // amount to move the triangle horizontally within the window
+	private static int triYOffset = 77; // amount to move the triangle vertically within the window
+	private static int triWidth = 500; // Width and length of the sides of the triangle
+	private static int triHeight = 433; // height of the triangle from the midpoint of the bottom side to the highest point of the triangle
 	
 
 
@@ -103,7 +114,9 @@ public class ChaosGame extends JComponent implements Runnable
 	 * @param turns sets the number of turns to be played in the game
 	 * @param setShowTurns if true a turn will be played and drawn every 500 milliseconds
 	 * 			, if false all turns will be played but not displayed to the
-	 * 			user untill all turns have been played.
+	 * 			user until all turns have been played.
+	 * @param setShowLines if true a line will be drawn between the last two points drawn,
+	 * 			if false no line will be drawn.
 	 */
 	private ChaosGame(int turns, boolean setShowTurns, boolean setShowLines)
 	{ 
