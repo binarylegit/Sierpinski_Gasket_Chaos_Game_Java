@@ -22,8 +22,6 @@ import java.util.*;
  * 	6 - repeat step 5 ad infinitum or up to some defined number of iterations.
  * 	7 - note the geometry of the resulting points within the triangle.
  *
- *  TODO: add fuller documentation
- *  TODO: the Point objects should not hold the offsets within themselves
  */ 
 public class ChaosGame extends JComponent implements Runnable
 {
@@ -169,8 +167,8 @@ public class ChaosGame extends JComponent implements Runnable
 	 * 		is to be generated.
 	 * @param triHeight the total height of the triangle in which random
 	 * 		point is to be generated.
-	 *
-	 * WARNING: the offset parameters will be removed soon!
+	 * @return returns a random point that is contained within the equilateral
+	 * 	triangle described by the input parameters.
 	 */
 	private Point getRandomPoint(int triWidth, int triHeight)
 	{
@@ -197,6 +195,13 @@ public class ChaosGame extends JComponent implements Runnable
 	}
 
 	
+	/**
+	 * This is the implementation of paint described by parent class
+	 * JComponent.  This takes care of all of drawing of the triangle
+	 * and its various components.
+	 *
+	 * @param g the graphics object that takes care of all of the drawing.
+	 */
 	public void paint(Graphics g)
 	{
 		// get the graphics component
@@ -240,8 +245,9 @@ public class ChaosGame extends JComponent implements Runnable
 
 
 	/**
-	 * This runs a thread to generate points for the Chaos Game according 
-	 * to it's rules.
+	 * This is the implementation of run method described by the interface
+	 * Runnable. This method runs the Chaos Game and calls the repaint method
+	 * when required.
 	 */
 	public void run()
 	{
@@ -277,6 +283,15 @@ public class ChaosGame extends JComponent implements Runnable
 	}
 
 
+	/** 
+	 * Given a point takeTurn will generate a new Point that lies 
+	 * halfway in between prevPoint and a randomly chosen 
+	 * vertex of the triangle.
+	 *
+	 * @param prevPoint The most recent previously generated point.
+	 * @return Returns a point that lies inbetween prevPoint and a
+	 * 	randomly chosen vertex of the triangle.
+	 */
 	private Point takeTurn(Point prevPoint)
 	{
 
@@ -295,7 +310,18 @@ public class ChaosGame extends JComponent implements Runnable
 	}
 
 
-	// val is an int between 1 and 3
+	/**
+	 * getPoint translates between one of the values 1,2, or 3
+	 * and returns a corresponding vertex of the triangle.  
+	 * The vertex chosen corresponds to these rules:
+	 * 	1 = a
+	 * 	2 = b
+	 * 	3 = c
+	 *
+	 * @param val An integer value of 1, 2, or 3 to be translated
+	 * 	to a vertex
+	 * @return Returns the corresponding vertex of the input val.
+	 */
 	private Point getPoint(int val)
 	{
 		if(val == 1)
@@ -314,15 +340,36 @@ public class ChaosGame extends JComponent implements Runnable
 	
 
 
+	/**
+	 * Point is a simple object that holds two cartesian
+	 * coordinates and allows them to be retrieved but not
+	 * modified
+	 */
 	class Point{
 		private int x;
 		private int y;
 
+		/** 
+		 * Constructor for Point object that initializes 
+		 * the cartesian coordinates
+		 *
+		 * @param newX the x part of the cartesian coordinate.
+		 * @param newY the y part of the cartesian coordinate.
+		 */
 		public Point(int newX, int newY) { x = newX; y = newY; }
 
+		/**
+		 * Getter method for the Y part of the cartesian coordinate.
+		 *
+		 * @return The value of the Y part of the cartesian coordinate
+		 */
 		public int getY() { return y; };
 
+		/**
+		 * Getter method for the X part of the cartesian coordinate.
+		 * 
+		 * @return The value of the X part of the cartesian coordinate
+		 */
 		public int getX() { return x; };
 	}
-
 }
