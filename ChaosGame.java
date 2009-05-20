@@ -23,6 +23,7 @@ import java.util.*;
  * 	7 - note the geometry of the resulting points within the triangle.
  *
  *  TODO: add fuller documentation
+ *  TODO: the Point objects should not hold the offsets within themselves
  */ 
 public class ChaosGame extends JComponent implements Runnable
 {
@@ -100,9 +101,9 @@ public class ChaosGame extends JComponent implements Runnable
 
 	// The Triangle is an equilateral triangle with sides of 500px
 	// Doing the math ( 433 = sqrt( 500^2 - 250^2 ) ) we get a height of ~433 px 
-	private Point aVertex = new Point(((triWidth / 2) + triXOffset), (triYOffset)); // location of the vertex a
-	private Point bVertex = new Point(triXOffset, (triHeight + triYOffset)); // location of the vertex b
-	private Point cVertex = new Point((triWidth + triXOffset), (triHeight + triYOffset)); // location of the vertex c
+	private Point aVertex = new Point(((triWidth / 2)), 0); // location of the vertex a
+	private Point bVertex = new Point(0, triHeight); // location of the vertex b
+	private Point cVertex = new Point(triWidth, triHeight); // location of the vertex c
 	private Random rand = new Random(); // global random object for generating random numbers
 	private boolean showTurns = true; // shall each turn be shown to the user (set by the user)
 	private boolean showLines = true; // shall a line be temporarily drawn illustrating each turn (set by the user)
@@ -131,12 +132,46 @@ public class ChaosGame extends JComponent implements Runnable
 
 
 	/**
-	 * getRandomPoint generates a random point within the triangle
-	 * that is specified by the Height and Width
+	 * getRandomPoint generates a random point within an equilateral 
+	 * triangle that is specified by the Height and Width, it then 
+	 * will add any offsets to the points that are necessary.
+	 *
+	 * TODO: the offset should not be included -- see the class TODO's
+	 *
+	 * Implementation: 
+	 * 	For clarity (since this is open source) I will provide some
+	 * 	implementation explanation.
+	 * 	
+	 * 	The first step is to grab a random y value in the range of the
+	 * 	height of the triangle.
+	 *
+	 * 	Then a relative x offset is calculated and a legal range of x
+	 * 	values is calculated.  
+	 *
+	 * 	Lastly a random x value is calculated within that legal x range.
+	 *
+	 * 	As an illustration:
+	 *
+	 * 			*
+	 * 		      * |
+	 * 		    *   |
+	 * 		  *     |
+	 * 	        *       |
+	 * 	      *         |
+	 * 	    *           |
+	 * 	  *-------------| &lt;-- random y value
+	 *|-------|---------------------------|
+	 *    ^relative x offset    ^legal x range
+	 *  *			|
+	 ***********************|
+	 *
+	 * @param triWidth the width of the triangle in which the random point
+	 * 		is to be generated.
+	 * @param triHeight the total height of the triangle in which random
+	 * 		point is to be generated.
+	 *
+	 * WARNING: the offset parameters will be removed soon!
 	 */
-	// TODO: this method uses both global object variables and input
-	// parameters to determine the random point this is an
-	// inconsistent use of data sources -- pick one(global or passed in)
 	private Point getRandomPoint(int triWidth, int triHeight)
 	{
 		// get a random point within the triangle
@@ -149,7 +184,7 @@ public class ChaosGame extends JComponent implements Runnable
 		// tangent(30) = .5773502692
 		Double xRange = ( .5773502692 * yVal) - 1;
 
-		Integer relXOffset = 250 - xRange.intValue();
+		Integer relXOffset = (triWidth / 2) - xRange.intValue();
 
 		xRange *= 2;
 
@@ -158,7 +193,7 @@ public class ChaosGame extends JComponent implements Runnable
 		Integer xVal = new Integer( rand.nextInt(xRange.intValue()) + 1);
 		//System.out.println("xVal: " + xVal); // DEBUG
 
-		return new Point((triXOffset + relXOffset + xVal), (triYOffset + yVal));
+		return new Point((relXOffset + xVal), (yVal));
 	}
 
 	
@@ -172,29 +207,32 @@ public class ChaosGame extends JComponent implements Runnable
 		g.drawString("Current Turn: " + currentTurn, 0, 20);
 		
 		// draw the points of the triangle
-		g.fillOval(aVertex.getX(), aVertex.getY(), 5, 5); // point a = 1
-		g.fillOval(bVertex.getX(), bVertex.getY(),  5, 5); // point b = 2
-		g.fillOval(cVertex.getX(), cVertex.getY(), 5, 5); // point c = 3
+		g.fillOval((aVertex.getX() + triXOffset), (aVertex.getY() + triYOffset), 5, 5); // point a = 1
+		g.fillOval((bVertex.getX() + triXOffset), (bVertex.getY() + triYOffset),  5, 5); // point b = 2
+		g.fillOval((cVertex.getX() + triXOffset), (cVertex.getY() + triYOffset), 5, 5); // point c = 3
 
 		// label the points of the triangle
 		// extra "magic" numbers are slight offsets so that the 
 		// vertex labels aren't overlapping the points they label
-		g.drawString("a", aVertex.getX(), (aVertex.getY() - 4));
-		g.drawString("b", (bVertex.getX() - 9), (bVertex.getY() + 9));
-		g.drawString("c", (cVertex.getX() + 9), (cVertex.getY() + 6));
+		g.drawString("a", (aVertex.getX() + triXOffset), (aVertex.getY() - 4 + triYOffset));
+		g.drawString("b", (bVertex.getX() - 9 + triXOffset), (bVertex.getY() + 9 + triYOffset));
+		g.drawString("c", (cVertex.getX() + 9 + triXOffset), (cVertex.getY() + 6 + triYOffset));
 
 
 		// draw the points
 		for( Point currPoint : points )
 		{
-			g.fillOval(currPoint.getX(), currPoint.getY(), 2, 2);
+			g.fillOval((currPoint.getX() + triXOffset), (currPoint.getY() + triYOffset), 2, 2);
 		}
 
 		if(showLines && (currentTurn != totalTurns))
 		{
 			Point point1 = points.get( points.size() - 1 );
 			Point point2 = points.get( points.size() - 2 );
-			g.drawLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
+			g.drawLine((point1.getX() + triXOffset), 
+				(point1.getY() + triYOffset), 
+				(point2.getX() + triXOffset), 
+				(point2.getY() + triYOffset));
 		}
 
 
