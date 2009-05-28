@@ -36,8 +36,19 @@ public class ChaosGame extends JComponent implements Runnable
 	{
 
 		// get the number of turns from the user
-		// TODO: catch the exception of a non-integer value here
-		Integer turns = new Integer(JOptionPane.showInputDialog("How many turns should be played (integer)"));
+		Integer turns = 1; 
+		boolean tryAgain = true;
+		while(tryAgain)
+		{
+			try {
+				tryAgain = false;
+				turns = new Integer(JOptionPane.showInputDialog("How many turns should be played (integer)"));
+
+			} catch (NumberFormatException nfo)
+			{
+				tryAgain = true;
+			}
+		}
 
 		boolean setShowTurns = false;
 		boolean setShowLines = false;
@@ -134,7 +145,6 @@ public class ChaosGame extends JComponent implements Runnable
 	 * triangle that is specified by the Height and Width, it then 
 	 * will add any offsets to the points that are necessary.
 	 *
-	 * TODO: the offset should not be included -- see the class TODO's
 	 *
 	 * Implementation: 
 	 * 	For clarity (since this is open source) I will provide some
